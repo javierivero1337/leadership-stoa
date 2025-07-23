@@ -209,6 +209,174 @@ s.parentNode.insertBefore(b, s);})(window.lintrk);
 <noscript>
 <img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=7990457&amp;fmt=gif">
 </noscript>
+
+<!-- Popup Modal CSS and JavaScript -->
+<style>
+.application-popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+}
+
+.application-popup-content {
+    background-color: white;
+    padding: 40px;
+    border-radius: 16px;
+    max-width: 500px;
+    margin: 20px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.application-popup-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    line-height: 1;
+}
+
+.application-popup-close:hover {
+    color: #000;
+}
+
+.application-popup-message {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: #0F1728;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.application-popup-ok {
+    background-color: #854DFF;
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.application-popup-ok:hover {
+    background-color: #6B3DCC;
+}
+</style>
+
+<!-- Popup HTML -->
+<div id="applicationPopup" class="application-popup-overlay">
+    <div class="application-popup-content">
+        <button class="application-popup-close" onclick="closeApplicationPopup()">&times;</button>
+        <p class="application-popup-message">Lo sentimos! Por ahora no estamos tomando aplicaciones.</p>
+        <button class="application-popup-ok" onclick="closeApplicationPopup()">Entendido</button>
+    </div>
+</div>
+
+<script>
+// Function to show the popup
+function showApplicationPopup(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    document.getElementById('applicationPopup').style.display = 'flex';
+    return false;
+}
+
+// Function to close the popup
+function closeApplicationPopup() {
+    document.getElementById('applicationPopup').style.display = 'none';
+}
+
+// Close popup when clicking outside
+document.getElementById('applicationPopup').addEventListener('click', function(event) {
+    if (event.target === this) {
+        closeApplicationPopup();
+    }
+});
+
+// Function to attach listeners to all "Aplica ahora" buttons
+function attachPopupListeners() {
+    // Find all links with href containing "aplica"
+    const aplicaLinks = document.querySelectorAll('a[href*="aplica"]');
+    
+    console.log('Found ' + aplicaLinks.length + ' links with "aplica" in href');
+    
+    // Add click event listener to each link
+    aplicaLinks.forEach(function(link) {
+        // Check if the link or any of its children contains "Aplica ahora" text
+        const linkText = link.textContent || '';
+        const hasAplicaText = linkText.includes('Aplica ahora') || link.innerHTML.includes('Aplica ahora');
+        
+        if (hasAplicaText) {
+            console.log('Attaching popup to link:', link);
+            
+            // Remove any existing onclick handlers
+            link.onclick = null;
+            
+            // Remove target attribute
+            link.removeAttribute('target');
+            
+            // Add our click handler
+            link.addEventListener('click', showApplicationPopup, true);
+            
+            // Also override href to prevent navigation
+            link.setAttribute('data-original-href', link.href);
+            link.href = 'javascript:void(0)';
+        }
+    });
+}
+
+// Try multiple times to ensure all elements are loaded
+document.addEventListener('DOMContentLoaded', function() {
+    attachPopupListeners();
+    
+    // Try again after a short delay in case of dynamic content
+    setTimeout(attachPopupListeners, 500);
+    setTimeout(attachPopupListeners, 1000);
+    setTimeout(attachPopupListeners, 2000);
+});
+
+// Also try when window is fully loaded
+window.addEventListener('load', function() {
+    attachPopupListeners();
+});
+
+// Use MutationObserver to catch dynamically added content
+if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length) {
+                attachPopupListeners();
+            }
+        });
+    });
+    
+    // Start observing when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
+</script>
     
 </body>
 </html>
